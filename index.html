@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bing 高清壁纸</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c14;
+      --card-bg: #12151f;
+      --border: rgba(255,255,255,0.07);
+      --text: #e6e8ee;
+      --text-dim: #8b93a7;
+      --accent: #4cc9f0;
+      --accent2: #7209b7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ===== 顶部 ===== */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,12,20,0.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 24px;
+    }
+
+    .header-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 1.35rem; font-weight: 800; letter-spacing: 0.5px;
+      background: linear-gradient(90deg, var(--accent), #b5179e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+
+    .logo small {
+      display: block; font-size: 0.68rem; font-weight: 400;
+      -webkit-text-fill-color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .search-box {
+      flex: 1; min-width: 200px; max-width: 420px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 14px 9px 38px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: rgba(76,201,240,0.5);
+      background: rgba(255,255,255,0.09);
+    }
+
+    .search-box::before {
+      content: '🔍';
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem; opacity: 0.6;
+    }
+
+    .filter-group {
+      display: flex; gap: 10px; align-items: center; margin-left: auto;
+    }
+
+    .filter-group select {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .stat {
+      font-size: 0.8rem; color: var(--text-dim); white-space: nowrap;
+    }
+
+    .stat b { color: var(--accent); }
+
+    /* ===== 瀑布流 ===== */
+    main {
+      max-width: 1400px; margin: 0 auto;
+      padding: 26px 24px 60px;
+    }
+
+    #masonry {
+      display: grid;
+      align-items: start;
+    }
+
+    .masonry-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 44px rgba(0,0,0,0.55);
+      border-color: rgba(76,201,240,0.28);
+    }
+
+    .card-img {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      cursor: zoom-in;
+      background: #1a1e2a;
+    }
+
+    .card-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease;
+    }
+
+    .card:hover .card-img img { transform: scale(1.06); }
+
+    .card-img .badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.62);
+      backdrop-filter: blur(4px);
+      color: #cfd6e4;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .card-img .mkt-badge {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(76,201,240,0.22);
+      border: 1px solid rgba(76,201,240,0.35);
+      color: var(--accent);
+      font-size: 0.68rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+
+    .card-info { padding: 13px 15px 15px; }
+
+    .card-info h3 {
+      font-size: 0.92rem; font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-info .copyright {
+      font-size: 0.76rem; color: var(--text-dim);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .card-info .actions { display: flex; gap: 8px; }
+
+    .card-info .actions a {
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+      padding: 7px 0;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.05);
+      color: #c3cbdc;
+      transition: all 0.2s;
+    }
+
+    .card-info .actions a:hover {
+      background: rgba(76,201,240,0.18);
+      border-color: rgba(76,201,240,0.45);
+      color: #fff;
+    }
+
+    .card-info .actions a.uhd {
+      background: linear-gradient(135deg, var(--accent2), #4361ee);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .card-info .actions a.uhd:hover { opacity: 0.85; }
+
+    /* ===== 加载 / 空状态 ===== */
+    .state {
+      text-align: center; padding: 90px 20px;
+      color: var(--text-dim);
+    }
+
+    .state .spinner {
+      width: 46px; height: 46px;
+      border: 4px solid rgba(255,255,255,0.1);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 18px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== 灯箱 ===== */
+    .lightbox {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.93);
+      z-index: 9999;
+      align-items: center; justify-content: center;
+      flex-direction: column;
+      cursor: zoom-out;
+      padding: 24px;
+    }
+
+    .lightbox.active { display: flex; }
+
+    .lightbox img {
+      max-width: 96%; max-height: 84vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+    }
+
+    .lightbox .lb-caption {
+      margin-top: 16px;
+      color: #b6bfd2;
+      font-size: 0.88rem;
+      text-align: center;
+      max-width: 80%;
+    }
+
+    /* ===== 回到顶部 ===== */
+    #backTop {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #4361ee);
+      border: none;
+      color: #fff; font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s, transform 0.2s;
+      z-index: 500;
+      box-shadow: 0 8px 24px rgba(67,97,238,0.4);
+    }
+
+    #backTop.show { opacity: 1; pointer-events: auto; }
+    #backTop:hover { transform: translateY(-3px); }
+
+    footer {
+      text-align: center; padding: 26px;
+      color: #3a4152; font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      .header-inner { gap: 12px; }
+      .filter-group { margin-left: 0; width: 100%; }
+      main { padding: 18px 14px 50px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        Bing 壁纸
+        <small>DAILY WALLPAPER ARCHIVE</small>
+      </div>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜索标题 / 版权信息...">
+      </div>
+      <div class="filter-group">
+        <select id="mktFilter"><option value="all">全部地区</option></select>
+        <span class="stat">共 <b id="totalCount">0</b> 张</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="masonry">
+      <div class="state">
+        <div class="spinner"></div>
+        <p>正在加载壁纸...</p>
+      </div>
+    </div>
+  </main>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lbImg" src="" alt="">
+    <div class="lb-caption" id="lbCaption"></div>
+  </div>
+
+  <button id="backTop" onclick="window.scrollTo({top:0})">↑</button>
+
+  <footer>数据来源：Bing 每日壁纸 · 由 GitHub Actions 自动更新 · 仅供个人学习使用</footer>
+
+  <script>
+    let ALL = [];            // 全部数据
+    const GAP = 18;          // 列间距
+    const MIN_COL = 290;     // 最小列宽
+
+    const masonry = document.getElementById('masonry');
+    const searchInput = document.getElementById('searchInput');
+    const mktFilter = document.getElementById('mktFilter');
+
+    /* ---------- 工具 ---------- */
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+
+    function downloadName(item, suffix) {
+      const clean = (item.title || item.id).replace(/[^\w\u4e00-\u9fa5\-\s]/g, '').trim() || 'bing';
+      return `${clean}_${item.date}_${suffix}.jpg`;
+    }
+
+    /* ---------- 卡片 ---------- */
+    function buildCard(item) {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const thumb = item.files.thumb || item.files.full || Object.values(item.files)[0];
+      const full  = item.files.full  || item.files.uhd  || thumb;
+      const uhd   = item.files.uhd;
+
+      card.innerHTML = `
+        <div class="card-img" data-full="${esc(full)}" data-caption="${esc(item.title)} — ${esc(item.copyright)}">
+          <img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy">
+          <span class="badge">${esc(item.date)}</span>
+          ${item.mkt ? `<span class="mkt-badge">${esc(item.mkt)}</span>` : ''}
+        </div>
+        <div class="card-info">
+          <h3>${esc(item.title) || esc(item.copyright)}</h3>
+          <p class="copyright">${esc(item.copyright)}</p>
+          <div class="actions">
+            <a href="${esc(full)}" download="${esc(downloadName(item, '1080P'))}">1080P</a>
+            ${uhd ? `<a class="uhd" href="${esc(uhd)}" download="${esc(downloadName(item, 'UHD'))}">UHD 超清</a>` : ''}
+          </div>
+        </div>
+      `;
+
+      card.querySelector('.card-img').addEventListener('click', e => {
+        openLightbox(e.currentTarget.dataset.full, e.currentTarget.dataset.caption);
+      });
+
+      return card;
+    }
+
+    /* ---------- 瀑布流布局（最短列优先） ---------- */
+    function layout(items) {
+      masonry.innerHTML = '';
+
+      if (items.length === 0) {
+        masonry.style.display = 'block';
+        masonry.innerHTML = `<div class="state"><p>没有找到匹配的壁纸</p></div>`;
+        return;
+      }
+
+      const width = masonry.clientWidth;
+      const colCount = Math.max(1, Math.floor((width + GAP) / (MIN_COL + GAP)));
+      const colWidth = (width - GAP * (colCount - 1)) / colCount;
+
+      masonry.style.display = 'grid';
+      masonry.style.gridTemplateColumns = `repeat(${colCount}, ${colWidth}px)`;
+      masonry.style.gap = GAP + 'px';
+      masonry.style.justifyContent = 'center';
+
+      // 列容器
+      const cols = [];
+      for (let i = 0; i < colCount; i++) {
+        const col = document.createElement('div');
+        col.className = 'masonry-col';
+        masonry.appendChild(col);
+        cols.push({ el: col, h: 0 });
+      }
+
+      // 隐藏测量器：与列同宽，用于在放置前测量卡片真实高度
+      const measurer = document.createElement('div');
+      measurer.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:${colWidth}px;`;
+      document.body.appendChild(measurer);
+
+      for (const item of items) {
+        const card = buildCard(item);
+        measurer.appendChild(card);
+        const h = card.offsetHeight;
+        // 放入当前最短列
+        const shortest = cols.reduce((a, b) => (a.h <= b.h ? a : b));
+        shortest.el.appendChild(card);
+        shortest.h += h + GAP;
+      }
+
+      measurer.remove();
+    }
+
+    /* ---------- 过滤 ---------- */
+    function applyFilter() {
+      const kw = searchInput.value.trim().toLowerCase();
+      const mkt = mktFilter.value;
+
+      const filtered = ALL.filter(item => {
+        if (mkt !== 'all' && item.mkt !== mkt) return false;
+        if (kw) {
+          const hay = `${item.title} ${item.copyright}`.toLowerCase();
+          if (!hay.includes(kw)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById('totalCount').textContent = filtered.length;
+      layout(filtered);
+    }
+
+    /* ---------- 灯箱 ---------- */
+    function openLightbox(src, caption) {
+      document.getElementById('lbImg').src = src;
+      document.getElementById('lbCaption').textContent = caption || '';
+      document.getElementById('lightbox').classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+      document.getElementById('lbImg').src = '';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    /* ---------- 回到顶部按钮 ---------- */
+    window.addEventListener('scroll', () => {
+      document.getElementById('backTop').classList.toggle('show', window.scrollY > 600);
+    });
+
+    /* ---------- 初始化 ---------- */
+    async function init() {
+      try {
+        const res = await fetch('data/wallpapers.json?_=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        ALL = await res.json();
+      } catch (err) {
+        masonry.style.display = 'block';
+        masonry.innerHTML = `<div class="state"><p>加载数据失败：${esc(err.message)}<br>请确认已运行抓取脚本生成 data/wallpapers.json</p></div>`;
+        return;
+      }
+
+      // 填充地区过滤器
+      const mkts = [...new Set(ALL.map(i => i.mkt).filter(Boolean))].sort();
+      mkts.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m; opt.textContent = m;
+        mktFilter.appendChild(opt);
+      });
+
+      applyFilter();
+    }
+
+    // 搜索防抖
+    let searchTimer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applyFilter, 250);
+    });
+    mktFilter.addEventListener('change', applyFilter);
+
+    // 窗口尺寸变化时重新布局（防抖）
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(applyFilter, 200);
+    });
+
+    init();
+  </script>
+</body>
+</html>

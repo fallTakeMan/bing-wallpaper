@@ -1,0 +1,56 @@
+name: Update Bing Wallpapers
+
+# 每天定时抓取 + 支持手动触发
+on:
+  schedule:
+    # UTC 02:30 = 北京时间 10:30（Bing 壁纸通常在零点后更新）
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '抓取天数 (1-16)'
+        required: false
+        default: '8'
+
+# 允许向仓库提交内容
+permissions:
+  contents: write
+
+# 避免并发重复执行
+concurrency:
+  group: update-wallpapers
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download wallpapers
+        run: node scripts/update.js
+        env:
+          # 需要多地区可改为: zh-CN,en-US,ja-JP
+          MARKETS: zh-CN
+          DAYS: ${{ github.event.inputs.days || '8' }}
+          # 控制仓库体积：最多保留 365 条（0 = 不裁剪）
+          MAX_KEEP: '365'
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/wallpapers.json wallpapers/
+          if git diff --staged --quiet; then
+            echo "没有变更，跳过提交"
+          else
+            git commit -m "chore: update wallpapers $(date -u +%Y-%m-%d)"
+            git push
+          fi
